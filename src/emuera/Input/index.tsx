@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useEra } from "../../utils/erars/bridge";
 
-const FloatingInput = styled.input`
+const FloatingInput = styled.input<{ active: boolean }>`
   position: absolute;
   left: 1em;
   right: 2em;
@@ -22,6 +22,8 @@ const FloatingInput = styled.input`
   &:hover {
     opacity: 1;
   }
+
+  ${({ active }) => !active && `opacity: 0 !important`};
 `;
 
 function EmueraInput() {
@@ -29,21 +31,18 @@ function EmueraInput() {
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <>
-      {(era.current_req?.ty === "Int" || era.current_req?.ty === "Str") && (
-        <FloatingInput
-          value={inputValue}
-          onInput={({ target }) =>
-            setInputValue((target as HTMLInputElement).value)
-          }
-          onKeyDown={({ key }) => {
-            if (key === "Enter") {
-              era.sendInput(inputValue).then(() => setInputValue(""));
-            }
-          }}
-        />
-      )}
-    </>
+    <FloatingInput
+      active={era.current_req?.ty === "Int" || era.current_req?.ty === "Str"}
+      value={inputValue}
+      onInput={({ target }) =>
+        setInputValue((target as HTMLInputElement).value)
+      }
+      onKeyDown={({ key }) => {
+        if (key === "Enter") {
+          era.sendInput(inputValue).then(() => setInputValue(""));
+        }
+      }}
+    />
   );
 }
 
