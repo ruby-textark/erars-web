@@ -19,35 +19,37 @@ const Status = styled.p`
   margin: auto;
 `;
 
+type LaunchState = "init" | "launching" | "ready" | "fail";
+
 declare global {
   const Erars: {
-    launch: (path: string) => Promise<any>;
+    launch: () => Promise<boolean>;
+    getState: () => LaunchState;
     getPort: () => Promise<number>;
   };
 }
 
-type LaunchState = "launching" | "launched" | "ready";
-
 function Launch() {
   const navigate = useNavigate();
-  const [launchState, setLaunchState] = useState<LaunchState>("launching");
+  const [launchState, setLaunchState] = useState<LaunchState>(Erars.getState());
 
   useEffect(() => {
     switch (launchState) {
-      case "launching":
-        Erars.launch("./eraTHYMKR").then(() => setLaunchState("launched"));
+      case "init":
+        Erars.launch().then((success) => setLaunchState(Erars.getState()));
         break;
-      case "launched":
+      case "ready":
         Erars.getPort().then((portNumber) => {
           connect(`localhost:${portNumber}`);
           navigate("/console");
         });
     }
   }, [launchState]);
+
   return (
     <LoadingBackground>
       <Title>erars-electron</Title>
-      <Status>{launchState}</Status>
+      <Status>{launchState}...</Status>
     </LoadingBackground>
   );
 }

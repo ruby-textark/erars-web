@@ -1,38 +1,68 @@
-import { ipcMain } from "electron";
+import { ipcMain, dialog } from "electron";
 import { platform, cwd } from "node:process";
 import child_process from "node:child_process";
 import portfinder from "portfinder";
 
 class Bridge {
+  path?: string;
   process?: child_process.ChildProcess;
   port?: number;
+  state: "init" | "launching" | "ready" | "fail";
 
-  constructor() {}
+  constructor() {
+    this.state = "init";
+  }
 
   private get executable() {
     if (platform === "win32") return "executables/erars.exe";
     return "executables/erars";
   }
 
+  async retrievePort() {
+    try {
+      this.port = await portfinder.getPortPromise({
+        startPort: 32767,
+        stopPort: 65535,
+      });
+    } catch (err) {
+      this.state = "fail";
+    }
+  }
+
+  async setupPath() {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory", "dontAddToRecent"],
+    });
+    [this.path] = result.filePaths;
+  }
+
   init() {
-    ipcMain.handle("erars:launch", async (event, path: string) => {
+    ipcMain.on("erars:getState", (event) => {
+      event.returnValue = this.state;
+    });
+
+    ipcMain.handle("erars:launch", async () => {
+      if (this.state !== "init") {
+        return false;
+      }
+
+      this.state = "launching";
       try {
-        this.port = await portfinder.getPortPromise({
-          port: 32767,
-          stopPort: 65535,
-        });
+        await Promise.all([this.retrievePort(), this.setupPath()]);
 
         this.process = child_process.spawn(
           this.executable,
-          [path, `--port=${this.port}`],
+          [this.path ?? "", `--port=${this.port}`],
           {
             cwd: cwd(),
             windowsHide: true,
           }
         );
 
+        this.state = "ready";
         return true;
       } catch (err) {
+        this.state = "fail";
         return false;
       }
     });

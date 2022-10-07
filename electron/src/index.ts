@@ -13,7 +13,6 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
-  win.webContents.openDevTools();
   if (env.mode === "DEV") {
     win.webContents.openDevTools();
     win.loadURL("http://localhost:5173");

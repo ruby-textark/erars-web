@@ -13,7 +13,7 @@ function App() {
     <FullscreenApp>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Launch />} />
+          <Route index path="/" element={<Launch />} />
           <Route path="/console" element={<Console />} />
         </Routes>
       </BrowserRouter>
