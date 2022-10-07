@@ -15,7 +15,7 @@ const EmueraBackground = styled.div<{ bg_color: [number, number, number] }>`
   flex-direction: column;
   overflow-y: auto;
 
-  font-family: ui-monospace;
+  font-family: D2Coding, monospace, ui-monospace;
   & p {
     margin: 0;
   }
