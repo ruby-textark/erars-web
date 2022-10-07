@@ -6,10 +6,10 @@ files: [
     "electron/dist/**/*",
   ]
 
-extraResources:
+extraFiles:
   # React build result
   - from: "dist"
-    to: "."
+    to: "dist"
     filter: "**/*"
 
   - from: "executables"

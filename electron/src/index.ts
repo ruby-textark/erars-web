@@ -17,7 +17,7 @@ function createWindow() {
     win.webContents.openDevTools();
     win.loadURL("http://localhost:5173");
   } else {
-    win.loadURL("resources/index.html");
+    win.loadFile(path.join(process.cwd(), "dist/index.html"));
   }
 }
 
