@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Console from "./emuera/Console";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Launch from "./emuera/Launch";
 
 const FullscreenApp = styled.div`
@@ -11,12 +11,12 @@ const FullscreenApp = styled.div`
 function App() {
   return (
     <FullscreenApp>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route index path="/" element={<Launch />} />
           <Route path="/console" element={<Console />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </FullscreenApp>
   );
 }
