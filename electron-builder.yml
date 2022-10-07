@@ -1,0 +1,21 @@
+appId: "net.textark.erarselectron"
+productName: "Erars-Electron"
+
+files: [
+    # Electron build result
+    "electron/dist/**/*",
+  ]
+
+extraResources:
+  # React build result
+  - from: "dist"
+    to: "."
+    filter: "**/*"
+
+  - from: "executables"
+    to: "executables"
+    filter: "**/*"
+
+directories:
+  buildResources: "resources"
+  output: "release"

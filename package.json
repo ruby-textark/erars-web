@@ -1,0 +1,36 @@
+{
+  "name": "erars-elctron",
+  "private": true,
+  "version": "0.0.0",
+  "main": "electron/dist/index.js",
+  "scripts": {
+    "dev:vite": "vite --host",
+    "dev:electron": "tsc -p electron/tsconfig.json && wait-on tcp:5173 && cross-env mode=DEV electron .",
+    "dev": "concurrently -k \"cross-env npm run dev:vite\" \"npm run dev:electron\"",
+    "build:vite": "tsc && vite build",
+    "build:electron": "tsc -p electron/tsconfig.json && electron-builder",
+    "build": "npm run build:vite && npm run build:electron",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "portfinder": "^1.0.32",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.2",
+    "styled-components": "^5.3.6",
+    "zustand": "^4.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@types/styled-components": "^5.1.26",
+    "@vitejs/plugin-react": "^2.1.0",
+    "concurrently": "^7.4.0",
+    "cross-env": "^7.0.3",
+    "electron": "^21.1.0",
+    "electron-builder": "^23.3.3",
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0",
+    "wait-on": "^6.0.1"
+  }
+}
