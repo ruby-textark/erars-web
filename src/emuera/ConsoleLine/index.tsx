@@ -4,7 +4,10 @@ import ButtonPart from "./Button";
 import LinePart from "./Line";
 import styled from "styled-components";
 
-const Line = styled.div``;
+const Line = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
 
 function ConsoleLineElement({ line }: { line: ConsoleLine }) {
   return (
