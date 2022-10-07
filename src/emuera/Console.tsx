@@ -35,7 +35,7 @@ const EmueraBackground = styled.div<{ bg_color: [number, number, number] }>`
 
   transition: color 0.5s ease;
 
-  & *:first-child {
+  & > *:first-child {
     margin-top: auto;
   }
 `;
@@ -65,7 +65,7 @@ function Console() {
     if (era.current_req?.ty === "Int" || era.current_req?.ty === "Str") {
       setSkipFlag(false);
     } else if (skipFlag) {
-      era.sendInput("").then(() => setSkipFlag(true));
+      era.sendInput("\r\n").then(() => setSkipFlag(true));
     }
   }, [era.current_req, skipFlag]);
 
@@ -78,7 +78,7 @@ function Console() {
           era.current_req?.ty === "AnyKey" ||
           era.current_req?.ty === "EnterKey"
         ) {
-          era.sendInput("");
+          era.sendInput("\r\n");
         }
       }}
       onContextMenu={() => setSkipFlag(true)}
