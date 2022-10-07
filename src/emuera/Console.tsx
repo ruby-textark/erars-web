@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useEra, useUpdate } from "../utils/erars/bridge";
 import ConsoleLineElement from "./ConsoleLine";
@@ -48,6 +48,7 @@ function Console() {
   const era = useEra();
   const { updateFlag, clearFlag } = useUpdate();
   const displayRef = useRef<HTMLDivElement>(null);
+  const [skipFlag, setSkipFlag] = useState(false);
 
   useEffect(() => {
     if (updateFlag) era.getState().then(() => clearFlag());
@@ -59,6 +60,14 @@ function Console() {
       top: displayRef.current?.scrollHeight,
     });
   }, [era.lines]);
+
+  useEffect(() => {
+    if (era.current_req?.ty === "Int" || era.current_req?.ty === "Str") {
+      setSkipFlag(false);
+    } else if (skipFlag) {
+      era.sendInput("").then(() => setSkipFlag(true));
+    }
+  }, [era.current_req, skipFlag]);
 
   return (
     <EmueraBackground
@@ -72,6 +81,7 @@ function Console() {
           era.sendInput("");
         }
       }}
+      onContextMenu={() => setSkipFlag(true)}
     >
       {era.lines.map((line, idx) => {
         const lineNo = idx + era.from;
