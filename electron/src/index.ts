@@ -1,7 +1,8 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import process, { env } from "node:process";
-import bridge from "./bridge";
+import erarsBridge from "./bridge/erars";
+import titleButtonBridge from "./bridge/titlebtn";
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -10,6 +11,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    titleBarStyle: "hidden",
     autoHideMenuBar: true,
   });
 
@@ -21,11 +23,14 @@ function createWindow() {
   } else {
     win.loadFile(path.join(process.cwd(), "dist/index.html"));
   }
+
+  return win;
 }
 
 app.whenReady().then(() => {
-  bridge.init();
-  createWindow();
+  erarsBridge.init();
+  const win = createWindow();
+  titleButtonBridge.init(win);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -8,7 +8,7 @@ const FloatingInput = styled.input`
   right: 2em;
   bottom: 1em;
 
-  padding: 1em;
+  padding: 0.75em;
   border: none;
   border-radius: 12px;
 
@@ -29,25 +29,35 @@ const FloatingInput = styled.input`
   }
 `;
 
+const BottomPadding = styled.div`
+  line-height: calc(4rem);
+`;
+
 function EmueraInput() {
   const era = useEra();
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <FloatingInput
-      disabled={
-        era.current_req?.ty === "AnyKey" || era.current_req?.ty === "EnterKey"
-      }
-      value={inputValue}
-      onInput={({ target }) =>
-        setInputValue((target as HTMLInputElement).value)
-      }
-      onKeyDown={({ key }) => {
-        if (key === "Enter") {
-          era.sendInput(inputValue).then(() => setInputValue(""));
-        }
-      }}
-    />
+    <>
+      <BottomPadding>
+        &nbsp;
+        <FloatingInput
+          disabled={
+            era.current_req?.ty === "AnyKey" ||
+            era.current_req?.ty === "EnterKey"
+          }
+          value={inputValue}
+          onInput={({ target }) =>
+            setInputValue((target as HTMLInputElement).value)
+          }
+          onKeyDown={({ key }) => {
+            if (key === "Enter") {
+              era.sendInput(inputValue).then(() => setInputValue(""));
+            }
+          }}
+        />
+      </BottomPadding>
+    </>
   );
 }
 

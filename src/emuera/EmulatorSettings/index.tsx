@@ -3,7 +3,7 @@ import useEmulatorSettings from "../../utils/settings";
 
 const FloatingButton = styled.div`
   position: absolute;
-  top: 1em;
+  top: calc(1em + 2em);
   right: 1em;
 
   padding: 0.5em;

@@ -14,7 +14,7 @@ const EmueraBackground = styled.div<{
 }>`
   flex: 1;
   background-color: rgb(${({ bg_color }) => bg_color.join(",")});
-  margin-left: 1em;
+  padding-left: 1em;
   height: 100%;
 
   display: flex;
@@ -46,10 +46,6 @@ const EmueraBackground = styled.div<{
   & > *:first-child {
     margin-top: auto;
   }
-`;
-
-const BottomPadding = styled.div`
-  line-height: 4em;
 `;
 
 function Console() {
@@ -98,9 +94,8 @@ function Console() {
           const lineNo = idx + era.from;
           return <ConsoleLineElement key={lineNo} line={line} />;
         })}
-        <BottomPadding>&nbsp;</BottomPadding>
+        <EmueraInput />
       </EmueraBackground>
-      <EmueraInput />
       <EmulatorSettingsDialog />
     </>
   );
