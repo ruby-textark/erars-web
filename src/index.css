@@ -1,7 +1,4 @@
-@font-face {
-  font-family: D2Coding;
-  src: url("/D2Coding-Ver1.3.2-20180524.ttc");
-}
+@import url("./font.css");
 
 :root {
   font-size: 16px;
