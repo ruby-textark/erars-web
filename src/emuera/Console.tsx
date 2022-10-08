@@ -21,8 +21,8 @@ const EmueraBackground = styled.div<{
   flex-direction: column;
   overflow-y: auto;
 
-  font-size: ${({ emulatorSettings }) => emulatorSettings.fontSize};
-  font-family: ${({ emulatorSettings }) => emulatorSettings.fontFamily},
+  font-size: ${({ emulatorSettings }) => emulatorSettings.fontSize}px;
+  font-family: "${({ emulatorSettings }) => emulatorSettings.fontFamily}",
     monospace, ui-monospace;
   & p {
     margin: 0;
@@ -79,28 +79,30 @@ function Console() {
   }, [era.current_req, skipFlag]);
 
   return (
-    <EmueraBackground
-      ref={displayRef}
-      bg_color={era.bg_color}
-      emulatorSettings={emulatorSettings}
-      onClick={() => {
-        if (
-          era.current_req?.ty === "AnyKey" ||
-          era.current_req?.ty === "EnterKey"
-        ) {
-          era.sendInput("\r\n");
-        }
-      }}
-      onContextMenu={() => setSkipFlag(true)}
-    >
-      {era.lines.map((line, idx) => {
-        const lineNo = idx + era.from;
-        return <ConsoleLineElement key={lineNo} line={line} />;
-      })}
-      <BottomPadding>&nbsp;</BottomPadding>
+    <>
+      <EmueraBackground
+        ref={displayRef}
+        bg_color={era.bg_color}
+        emulatorSettings={emulatorSettings}
+        onClick={() => {
+          if (
+            era.current_req?.ty === "AnyKey" ||
+            era.current_req?.ty === "EnterKey"
+          ) {
+            era.sendInput("\r\n");
+          }
+        }}
+        onContextMenu={() => setSkipFlag(true)}
+      >
+        {era.lines.map((line, idx) => {
+          const lineNo = idx + era.from;
+          return <ConsoleLineElement key={lineNo} line={line} />;
+        })}
+        <BottomPadding>&nbsp;</BottomPadding>
+      </EmueraBackground>
       <EmueraInput />
       <EmulatorSettingsDialog />
-    </EmueraBackground>
+    </>
   );
 }
 
