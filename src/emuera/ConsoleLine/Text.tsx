@@ -1,31 +1,86 @@
 import styled from "styled-components";
-import type { TextType, TextStyle } from "../../utils/erars/types";
-import { FontStyleBit } from "../../utils/erars/types";
+import { TextType, TextStyle, FontStyleBit } from "../../utils/erars/types";
+import useEmulatorSettings from "../../utils/settings";
+import { EmulatorSettings } from "../../utils/settings/types";
 
-function checkStyle(textStyle: TextStyle, flag: FontStyleBit, value: string) {
-  return textStyle.font_style?.bits & flag ? value : undefined;
+function fontStyles(style: TextStyle) {
+  const classNames = {
+    [FontStyleBit.BOLD]: "bold",
+    [FontStyleBit.ITALIC]: "italic",
+    [FontStyleBit.STRIKELINE]: "strikeline",
+    [FontStyleBit.UNDERLINE]: "underline",
+  };
+
+  return Object.entries(classNames)
+    .flatMap(([key, value]) => {
+      if ((style.font_style?.bits & (+key as FontStyleBit)) !== 0) return value;
+      return [];
+    })
+    .join(" ");
 }
 
-const Text = styled.p<{
+const Text = styled.span<{
   textStyle: TextStyle;
+  emulatorSettings: EmulatorSettings;
 }>`
   color: rgb(${({ textStyle }) => textStyle.color.join(",")});
   font-family: ${({ textStyle }) => textStyle.font_family};
-  font-weight: ${({ textStyle }) =>
-    checkStyle(textStyle, FontStyleBit.BOLD, "bold") ?? "normal"};
-  font-style: ${({ textStyle }) =>
-    checkStyle(textStyle, FontStyleBit.ITALIC, "italic") ?? "normal"};
-  text-decoration: ${({ textStyle }) =>
-    [
-      checkStyle(textStyle, FontStyleBit.STRIKELINE, "line-through") ?? "",
-      checkStyle(textStyle, FontStyleBit.UNDERLINE, "underline") ?? "",
-    ].join(" ")};
+
+  &.bold {
+    font-weight: bold;
+  }
+  &.italic {
+    font-style: italic;
+  }
+  &.strikeline {
+    text-decoration: line-through;
+  }
+  &.underline {
+    text-decoration: underline;
+  }
+  &.strikeline.underline {
+    text-decoration: line-through underline;
+  }
+
+  &.bold.faux {
+    letter-spacing: 1px;
+    font-weight: normal;
+    text-shadow: 1px 0 0 currentColor;
+  }
+  &.italic.faux {
+    transform: skewX(-18deg);
+  }
+
+  @media (min-device-pixel-ratio: 1.5), (min-resolution: 120dpi) {
+    &.bold.faux {
+      letter-spacing: 1px;
+      font-weight: normal;
+      text-shadow: 0.5px 0 0 currentColor, 1px 0 0 currentColor;
+    }
+  }
+
+  @media (min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
+    .bold {
+      letter-spacing: 1px;
+      font-weight: normal;
+      text-shadow: 0.333px 0 0 currentColor, 0.666px 0 0 currentColor,
+        1px solid currentColor;
+    }
+  }
 `;
 
 function TextPart({ part }: { part: TextType }) {
+  const emulatorSettings = useEmulatorSettings();
+
   const [textContent, textStyle] = part;
   return (
-    <Text textStyle={textStyle}>{textContent.replace(/ /g, "\u00A0")}</Text>
+    <Text
+      textStyle={textStyle}
+      className={fontStyles(textStyle)}
+      emulatorSettings={emulatorSettings}
+    >
+      {textContent.replace(/ /g, "\u00A0")}
+    </Text>
   );
 }
 

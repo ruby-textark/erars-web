@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useEra, useUpdate } from "../utils/erars/bridge";
+import useEmulatorSettings from "../utils/settings";
 import ConsoleLineElement from "./ConsoleLine";
 import EmueraInput from "./Input";
-import SettingsButton from "./Settings";
+import SettingsButton from "./EmulatorSettings";
+import type { EmulatorSettings } from "../utils/settings/types";
+import EmulatorSettingsDialog from "./EmulatorSettings/Dialog";
 
-const EmueraBackground = styled.div<{ bg_color: [number, number, number] }>`
+const EmueraBackground = styled.div<{
+  bg_color: [number, number, number];
+  emulatorSettings: EmulatorSettings;
+}>`
   flex: 1;
   background-color: rgb(${({ bg_color }) => bg_color.join(",")});
   margin-left: 1em;
@@ -15,7 +21,9 @@ const EmueraBackground = styled.div<{ bg_color: [number, number, number] }>`
   flex-direction: column;
   overflow-y: auto;
 
-  font-family: D2Coding, monospace, ui-monospace;
+  font-size: ${({ emulatorSettings }) => emulatorSettings.fontSize};
+  font-family: ${({ emulatorSettings }) => emulatorSettings.fontFamily},
+    monospace, ui-monospace;
   & p {
     margin: 0;
   }
@@ -46,6 +54,7 @@ const BottomPadding = styled.div`
 
 function Console() {
   const era = useEra();
+  const emulatorSettings = useEmulatorSettings();
   const { updateFlag, clearFlag } = useUpdate();
   const displayRef = useRef<HTMLDivElement>(null);
   const [skipFlag, setSkipFlag] = useState(false);
@@ -73,6 +82,7 @@ function Console() {
     <EmueraBackground
       ref={displayRef}
       bg_color={era.bg_color}
+      emulatorSettings={emulatorSettings}
       onClick={() => {
         if (
           era.current_req?.ty === "AnyKey" ||
@@ -89,7 +99,7 @@ function Console() {
       })}
       <BottomPadding>&nbsp;</BottomPadding>
       <EmueraInput />
-      <SettingsButton />
+      <EmulatorSettingsDialog />
     </EmueraBackground>
   );
 }
