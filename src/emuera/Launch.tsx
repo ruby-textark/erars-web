@@ -10,13 +10,16 @@ const LoadingBackground = styled.div`
   flex-direction: column;
 `;
 
-const Title = styled.h1`
+const Wrapper = styled.div`
   color: white;
   margin: auto;
 `;
+
+const Title = styled.h1`
+  font-size: 3em;
+`;
 const Status = styled.p`
-  color: white;
-  margin: auto;
+  text-align: center;
 `;
 
 type LaunchState = "init" | "launching" | "ready" | "fail";
@@ -36,7 +39,7 @@ function Launch() {
   useEffect(() => {
     switch (launchState) {
       case "init":
-        Erars.launch().then((success) => setLaunchState(Erars.getState()));
+        Erars.launch().then(() => setLaunchState(Erars.getState()));
         break;
       case "ready":
         Erars.getPort().then((portNumber) => {
@@ -48,8 +51,10 @@ function Launch() {
 
   return (
     <LoadingBackground>
-      <Title>erars-electron</Title>
-      <Status>{launchState}...</Status>
+      <Wrapper>
+        <Title>erars-electron</Title>
+        <Status>{launchState}...</Status>
+      </Wrapper>
     </LoadingBackground>
   );
 }

@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from "electron";
-import { platform, cwd } from "node:process";
+import { platform, cwd, env } from "node:process";
 import child_process from "node:child_process";
 import portfinder from "portfinder";
 
@@ -20,10 +20,9 @@ class Bridge {
 
   async retrievePort() {
     try {
-      this.port = await portfinder.getPortPromise({
-        startPort: 32767,
-        stopPort: 65535,
-      });
+      portfinder.setBasePort(32767);
+      portfinder.setHighestPort(65535);
+      this.port = await portfinder.getPortPromise();
     } catch (err) {
       this.state = "fail";
     }
@@ -33,6 +32,8 @@ class Bridge {
     const result = await dialog.showOpenDialog({
       properties: ["openDirectory", "dontAddToRecent"],
     });
+
+    if (result.canceled) throw new Error("Dialog closed");
     [this.path] = result.filePaths;
   }
 
@@ -42,7 +43,7 @@ class Bridge {
     });
 
     ipcMain.handle("erars:launch", async () => {
-      if (this.state !== "init") {
+      if (this.state === "launching") {
         return false;
       }
 
@@ -52,7 +53,9 @@ class Bridge {
 
         this.process = child_process.spawn(
           this.executable,
-          [this.path ?? "", `--port=${this.port}`],
+          [this.path ?? "", `--port=${this.port}`].concat(
+            env.mode === "DEV" ? [`--log-level=trace`] : []
+          ),
           {
             cwd: cwd(),
             windowsHide: true,
