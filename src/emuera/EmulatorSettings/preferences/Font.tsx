@@ -1,24 +1,7 @@
 import Creatable from "react-select/creatable";
-import styled from "styled-components";
 import useEmulatorSettings from "../../../utils/settings";
 import { BuiltinFontNames } from "../../../utils/settings/types";
-
-const PreferencesDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  gap: 1em;
-`;
-const FontSizeInput = styled.input`
-  background-color: white;
-  color: black;
-
-  border: 1px solid lightgrey;
-  border-radius: 4px;
-
-  padding: 0.75em;
-  margin-right: 2px;
-`;
+import PreferencesDiv, { PreferencesText } from "./Common";
 
 const builtinFonts = BuiltinFontNames.map((fontName) => ({
   value: fontName,
@@ -43,8 +26,8 @@ function FontPreferences() {
           )
         }
       />
-      Font Size
-      <FontSizeInput
+      Font Size(px)
+      <PreferencesText
         type="number"
         min="6"
         max="48"
@@ -56,7 +39,6 @@ function FontPreferences() {
           }
         }}
       />
-      px
     </PreferencesDiv>
   );
 }

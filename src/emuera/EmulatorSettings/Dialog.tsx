@@ -3,6 +3,7 @@ import styled from "styled-components";
 import SettingsButton from ".";
 import useEmulatorSettings from "../../utils/settings";
 import FontPreferences from "./preferences/Font";
+import InputPreferences from "./preferences/Input";
 
 const ModalDialog = styled.dialog`
   background: white;
@@ -40,6 +41,7 @@ function EmulatorSettingsDialog() {
         <DialogContent>
           <DialogTitle>Emulator Settings</DialogTitle>
           <FontPreferences />
+          <InputPreferences />
           <button onClick={() => emulatorSettings.dialog(false)}>Close</button>
         </DialogContent>
       </ModalDialog>

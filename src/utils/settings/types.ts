@@ -6,6 +6,7 @@ export const BuiltinFontNames: BuiltinFonts[] = [
 ];
 
 type EmulatorSettings = {
+  // Font preferences
   fontFamily: BuiltinFonts | string;
   fontSize: number;
   fauxRender: boolean;
@@ -13,6 +14,11 @@ type EmulatorSettings = {
   setFontFamily: (fontFamily: string) => void;
   setFontSize: (fontSize: number) => void;
   setFauxRender: (fauxRender: boolean) => void;
+
+  // Input preferences
+  arrowInput: boolean;
+
+  setArrowInput: (arrowInput: boolean) => void;
 
   dialogOpen: boolean;
   dialog: (dialogOpen: boolean) => void;

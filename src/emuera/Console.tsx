@@ -7,6 +7,7 @@ import EmueraInput from "./Input";
 import SettingsButton from "./EmulatorSettings";
 import type { EmulatorSettings } from "../utils/settings/types";
 import EmulatorSettingsDialog from "./EmulatorSettings/Dialog";
+import { useInput } from "../utils/console/input";
 
 const EmueraBackground = styled.div<{
   bg_color: [number, number, number];
@@ -54,6 +55,8 @@ function Console() {
   const { updateFlag, clearFlag } = useUpdate();
   const displayRef = useRef<HTMLDivElement>(null);
   const [skipFlag, setSkipFlag] = useState(false);
+
+  useInput();
 
   useEffect(() => {
     if (updateFlag) era.getState().then(() => clearFlag());
