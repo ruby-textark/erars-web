@@ -32,14 +32,8 @@ const TitleText = styled.p`
   text-align: center;
 
   color: white;
-  font-weight: bold;
 
   transition: 500ms;
-
-  &.active,
-  &:has(+ div:hover) {
-    text-shadow: 1px 4px 4px black;
-  }
 `;
 
 const DragArea = styled.div`
