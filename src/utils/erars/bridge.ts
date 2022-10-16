@@ -35,7 +35,7 @@ class Bridge {
     getState: async () => {
       const { lines, from } = get();
 
-      const resp = this.erarsContext.run(from).json() as EmueraResponse;
+      const resp = JSON.parse(this.erarsContext.run(from)) as EmueraResponse;
 
       console.log(resp);
 
