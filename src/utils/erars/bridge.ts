@@ -2,22 +2,22 @@ import { EmueraResponse, EmueraState, FontStyleBit } from "./types";
 import create from "zustand";
 import { useEffect, useState } from "react";
 
-import { ErarsContext, init_logger } from "erars-wasm";
+// This doesn't work WTF
+//
+// import { ErarsContext, init_logger } from "erars-wasm";
+import { ErarsContext, init_logger } from "../../../node_modules/erars-wasm/erars_wasm";
 
 class Bridge {
   maxLines: number;
   erarsContext: ErarsContext;
-  setUpdateFlag: ((flag: boolean) => void);
 
   constructor(erarsContext: ErarsContext) {
     this.maxLines = 2000;
     this.erarsContext = erarsContext;
-    this.setUpdateFlag = (flag) => {};
   }
 
   useUpdate = () => {
     const [updateFlag, setUpdateFlag] = useState(true);
-    this.setUpdateFlag = setUpdateFlag;
     return { updateFlag, clearFlag: () => setUpdateFlag(false) };
   };
 
