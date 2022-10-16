@@ -2,51 +2,19 @@ import { EmueraResponse, EmueraState, FontStyleBit } from "./types";
 import create from "zustand";
 import { useEffect, useState } from "react";
 
-type Host = {
-  http: string;
-  webSocket: string;
-};
+import { ErarsContext, init_logger } from "erars-wasm";
 
 class Bridge {
-  host?: Host;
-  socket?: WebSocket;
   maxLines: number;
-  fallbackTimeout: number;
-  fallbackHandle?: NodeJS.Timeout;
+  erarsContext: ErarsContext;
 
-  constructor() {
+  constructor(erarsContext: ErarsContext) {
     this.maxLines = 2000;
-    this.fallbackTimeout = 5000;
+    this.erarsContext = erarsContext;
   }
-
-  connect = (host: string) => {
-    this.host = {
-      http: `http://${host}`,
-      webSocket: `ws://${host}`,
-    };
-
-    this.connectWebSocket();
-  };
-
-  private connectWebSocket = () => {
-    this.socket = new WebSocket(`${this.host?.webSocket}/listen`);
-  };
 
   useUpdate = () => {
     const [updateFlag, setUpdateFlag] = useState(true);
-
-    useEffect(() => {
-      if (!this.socket) {
-        throw new Error("useUpdate() must be called after connect()");
-      }
-
-      this.socket?.addEventListener("message", (e) => {
-        if (this.fallbackHandle) {
-          clearInterval(this.fallbackHandle);
-        }
-        setUpdateFlag(true);
-      });
-    }, []);
 
     return { updateFlag, clearFlag: () => setUpdateFlag(false) };
   };
@@ -60,18 +28,16 @@ class Bridge {
     bg_color: [0, 0, 0],
     hl_color: [255, 255, 0],
     lines: [],
+    exited: false,
 
     from: 0,
 
     getState: async () => {
       const { lines, from } = get();
 
-      // Request after current line number.
-      const resp = await fetch(`${this.host?.http}/?from=${from}`, {
-        method: "GET",
-      })
-        .then((resp) => resp.json())
-        .then((json) => json as EmueraResponse);
+      const resp = this.erarsContext.run(from).json() as EmueraResponse;
+
+      console.log(resp);
 
       // Trim empty lines.
       const responseLines = resp.lines.filter((line) => {
@@ -122,22 +88,19 @@ class Bridge {
           .map((line) => ({ ...line, active: false })),
       });
 
-      await fetch(`${this.host?.http}/input`, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: input,
-      });
-
-      if (this.fallbackHandle) {
-        clearTimeout(this.fallbackHandle);
-      }
-      this.fallbackHandle = setInterval(() => {
-        getState();
-      }, this.fallbackTimeout);
+      this.erarsContext?.set_input(input);
     },
   }));
 }
 
-const singletonInstance = new Bridge();
-export const { useEra, useUpdate, connect } = singletonInstance;
+init_logger();
+
+const game = await fetch("game.era").then(r => r.arrayBuffer());
+const config = await fetch("emuera.config").then(r => r.text());
+
+const erarsContext = new ErarsContext(new Uint8Array(game), config);
+console.log("Load game done.");
+const singletonInstance = new Bridge(erarsContext);
+
+export const { useEra, useUpdate } = singletonInstance;
 export default singletonInstance;

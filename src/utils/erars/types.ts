@@ -40,6 +40,7 @@ type ConsoleLine = {
 };
 
 type EmueraResponse = {
+  exited: boolean;
   current_req: InputRequest | null;
   bg_color: Color;
   hl_color: Color;

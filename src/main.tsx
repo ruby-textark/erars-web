@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { init_logger } from "erars-wasm";
 import "./index.css";
 
 import "./assets/fontawesome/css/fontawesome.css";
