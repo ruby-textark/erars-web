@@ -7,15 +7,17 @@ import { ErarsContext, init_logger } from "erars-wasm";
 class Bridge {
   maxLines: number;
   erarsContext: ErarsContext;
+  setUpdateFlag: ((flag: boolean) => void);
 
   constructor(erarsContext: ErarsContext) {
     this.maxLines = 2000;
     this.erarsContext = erarsContext;
+    this.setUpdateFlag = (flag) => {};
   }
 
   useUpdate = () => {
     const [updateFlag, setUpdateFlag] = useState(true);
-
+    this.setUpdateFlag = setUpdateFlag;
     return { updateFlag, clearFlag: () => setUpdateFlag(false) };
   };
 
@@ -35,8 +37,7 @@ class Bridge {
     getState: async () => {
       const { lines, from } = get();
 
-      const resp = JSON.parse(this.erarsContext.run(from)) as EmueraResponse;
-
+      const resp = this.erarsContext.run(from) as EmueraResponse;
       console.log(resp);
 
       // Trim empty lines.

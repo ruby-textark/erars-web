@@ -17,7 +17,7 @@ function App() {
       <Titlebar />
       <HashRouter>
         <Routes>
-          <Route index path="/console" element={<Console />} />
+          <Route index path="/" element={<Console />} />
         </Routes>
       </HashRouter>
     </FullscreenApp>
