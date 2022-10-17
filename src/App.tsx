@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import Console from "./emuera/Console";
 import { HashRouter, Routes, Route } from "react-router-dom";
-import Titlebar from "./Titlebar";
 
 const FullscreenApp = styled.div`
   display: flex;
@@ -11,10 +10,8 @@ const FullscreenApp = styled.div`
 `;
 
 function App() {
-
   return (
     <FullscreenApp>
-      <Titlebar />
       <HashRouter>
         <Routes>
           <Route index path="/" element={<Console />} />
