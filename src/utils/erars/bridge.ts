@@ -1,6 +1,7 @@
 import { EmueraResponse, EmueraState, FontStyleBit } from "./types";
 import create from "zustand";
 import { useEffect, useState } from "react";
+import JSZip from "jszip";
 
 // This doesn't work WTF
 //
@@ -100,10 +101,13 @@ class Bridge {
 
 init_logger();
 
-const game = await fetch("game.era").then((r) => r.arrayBuffer());
+const rawGame = await fetch("game.zip").then((r) => r.arrayBuffer());
+const gameZip = await JSZip.loadAsync(rawGame);
+const gameFile = await gameZip.file("game.era")!.async("uint8array");
+
 const config = await fetch("emuera.config").then((r) => r.text());
 
-const erarsContext = new ErarsContext(new Uint8Array(game), config);
+const erarsContext = new ErarsContext(new Uint8Array(gameFile), config);
 console.log("Load game done.");
 const singletonInstance = new Bridge(erarsContext);
 
