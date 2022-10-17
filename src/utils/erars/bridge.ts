@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 // This doesn't work WTF
 //
 // import { ErarsContext, init_logger } from "erars-wasm";
-import { ErarsContext, init_logger } from "../../../node_modules/erars-wasm/erars_wasm";
+import {
+  ErarsContext,
+  init_logger,
+} from "../../../node_modules/erars-wasm/erars_wasm";
 
 class Bridge {
   maxLines: number;
@@ -90,14 +93,15 @@ class Bridge {
       });
 
       this.erarsContext?.set_input(input);
+      getState();
     },
   }));
 }
 
 init_logger();
 
-const game = await fetch("game.era").then(r => r.arrayBuffer());
-const config = await fetch("emuera.config").then(r => r.text());
+const game = await fetch("game.era").then((r) => r.arrayBuffer());
+const config = await fetch("emuera.config").then((r) => r.text());
 
 const erarsContext = new ErarsContext(new Uint8Array(game), config);
 console.log("Load game done.");
