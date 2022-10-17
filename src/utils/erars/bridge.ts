@@ -41,32 +41,37 @@ class Bridge {
     getState: async () => {
       const { lines, from } = get();
 
-      const resp = this.erarsContext.run(from) as EmueraResponse;
-      console.log(resp);
+      try {
+        const resp = this.erarsContext.run(from) as EmueraResponse;
+        console.log(resp);
 
-      // Trim empty lines.
-      const responseLines = resp.lines.filter((line) => {
-        return line.parts !== undefined;
-      });
+        // Trim empty lines.
+        const responseLines = resp.lines.filter((line) => {
+          return line.parts !== undefined;
+        });
 
-      // Concatenate with existing lines.
-      const accLines = lines.concat(
-        responseLines
-          // Activate new lines
-          .map((line) => ({ ...line, active: true }))
-      );
+        // Concatenate with existing lines.
+        const accLines = lines.concat(
+          responseLines
+            // Activate new lines
+            .map((line) => ({ ...line, active: true }))
+        );
 
-      set({
-        ...resp,
-        lines: accLines,
-        from: from + responseLines.length,
-      });
+        set({
+          ...resp,
+          lines: accLines,
+          from: from + responseLines.length,
+        });
 
-      // Slice lines if the length exceeds max line cap.
-      if (accLines.length > this.maxLines)
-        set({ lines: accLines.slice(accLines.length - this.maxLines) });
+        // Slice lines if the length exceeds max line cap.
+        if (accLines.length > this.maxLines)
+          set({ lines: accLines.slice(accLines.length - this.maxLines) });
 
-      return resp;
+        return resp;
+      } catch (err) {
+        alert(err);
+        return {} as EmueraResponse;
+      }
     },
 
     sendInput: async (input: string) => {
