@@ -47,12 +47,12 @@ function EmueraInput() {
             era.current_req?.ty === "EnterKey"
           }
           value={inputValue}
-          onInput={({ target }) =>
+          onInput={({ target }: InputEvent) =>
             setInputValue((target as HTMLInputElement).value)
           }
-          onKeyDown={({ key }) => {
+          onKeyDown={({ key }: KeyboardEvent) => {
             if (key === "Enter") {
-              era.sendInput(inputValue).then(() => setInputValue(""));
+              era.sendInput(inputValue);
             }
           }}
         />

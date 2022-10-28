@@ -9,8 +9,10 @@ function InputPreferences() {
         <PreferencesCheck
           id="arrow-input"
           checked={emulatorSettings.arrowInput}
-          onChange={({ target }) => {
-            emulatorSettings.setArrowInput(target.checked);
+          onChange={({ target }: InputEvent) => {
+            emulatorSettings.setArrowInput(
+              (target as HTMLInputElement).checked
+            );
           }}
         />
         <label htmlFor="dir-input">Direction Input</label>

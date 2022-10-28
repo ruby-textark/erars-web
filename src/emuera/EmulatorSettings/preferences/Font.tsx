@@ -1,6 +1,6 @@
 import Creatable from "react-select/creatable";
 import useEmulatorSettings from "../../../utils/settings";
-import { BuiltinFontNames } from "../../../utils/settings/types";
+import { BuiltinFontNames, BuiltinFonts } from "../../../utils/settings/types";
 import PreferencesDiv, { PreferencesText } from "./Common";
 
 const builtinFonts = BuiltinFontNames.map((fontName) => ({
@@ -20,7 +20,7 @@ function FontPreferences() {
           value: emulatorSettings.fontFamily,
           label: emulatorSettings.fontFamily,
         }}
-        onChange={(value) =>
+        onChange={(value: { value: string | BuiltinFonts }) =>
           emulatorSettings.setFontFamily(
             value?.value ?? emulatorSettings.fontFamily
           )
@@ -32,7 +32,7 @@ function FontPreferences() {
         min="6"
         max="48"
         value={emulatorSettings.fontSize}
-        onInput={({ target }) => {
+        onInput={({ target }: InputEvent) => {
           const fontSize = +(target as HTMLInputElement).value;
           if (6 <= fontSize && fontSize <= 24) {
             emulatorSettings.setFontSize(fontSize);

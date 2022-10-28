@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { useEra, useUpdate } from "../utils/erars/bridge";
+import { useEra } from "../utils/erars/bridge";
 import useEmulatorSettings from "../utils/settings";
 import ConsoleLineElement from "./ConsoleLine";
 import EmueraInput from "./Input";
@@ -52,15 +52,10 @@ const EmueraBackground = styled.div<{
 function Console() {
   const era = useEra();
   const emulatorSettings = useEmulatorSettings();
-  const { updateFlag, clearFlag } = useUpdate();
   const displayRef = useRef<HTMLDivElement>(null);
   const [skipFlag, setSkipFlag] = useState(false);
 
   useInput();
-
-  useEffect(() => {
-    if (updateFlag) era.getState().then(() => clearFlag());
-  }, [updateFlag]);
 
   useEffect(() => {
     displayRef.current?.scrollTo({
@@ -73,7 +68,8 @@ function Console() {
     if (era.current_req?.ty === "Int" || era.current_req?.ty === "Str") {
       setSkipFlag(false);
     } else if (skipFlag) {
-      era.sendInput("\r\n").then(() => setSkipFlag(true));
+      era.sendInput("\r\n");
+      setSkipFlag(true);
     }
   }, [era.current_req, skipFlag]);
 

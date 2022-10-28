@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import preact from "@preact/preset-vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
@@ -11,5 +11,13 @@ export default defineConfig({
     },
   },
   base: "./",
-  plugins: [react(), wasm(), topLevelAwait()],
+  build: {
+    target: ["esnext"],
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: ["esnext"],
+    },
+  },
+  plugins: [preact(), wasm(), topLevelAwait()],
 });
