@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "erars-wasm": "^0.2.1",
+    "erars-wasm": "^0.3.3",
     "jszip": "^3.10.1",
     "localforage": "^1.10.0",
     "react-router-dom": "^6.4.2",
