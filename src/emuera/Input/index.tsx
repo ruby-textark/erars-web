@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { useEra } from "../../utils/erars/bridge";
+import useEra from "../../utils/erars/hooks";
 
 const FloatingInput = styled.input`
   position: absolute;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useEra } from "../erars/bridge";
+import useEra from "../erars/hooks";
 import useEmulatorSettings from "../settings";
 
 function useInput() {

@@ -34,6 +34,7 @@ type ConsoleLinePart = {
   Button?: ButtonType;
 };
 type ConsoleLine = {
+  align?: "Center" | "Left" | "Right";
   parts: ConsoleLinePart[];
   /** @description true if this line was included in the last response. */
   active?: boolean;
@@ -48,9 +49,9 @@ type EmueraResponse = {
 };
 
 type EmueraState = {
-  from: number;
-  getState: () => Promise<EmueraResponse>;
-  sendInput: (input: string) => Promise<void>;
+  maxLines: number;
+  update: () => void;
+  sendInput: (input: string | number) => void;
 } & EmueraResponse;
 
 export { FontStyleBit };

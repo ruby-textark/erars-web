@@ -1,7 +1,6 @@
-import { EmueraResponse, EmueraState, FontStyleBit } from "./types";
-import create from "zustand";
-import { useEffect, useState } from "react";
+import { EmueraResponse } from "./types";
 import JSZip from "jszip";
+import localforage from "localforage";
 
 // This doesn't work WTF
 //
@@ -10,98 +9,57 @@ import {
   ErarsContext,
   init_logger,
 } from "../../../node_modules/erars-wasm/erars_wasm";
+import Stream from "./stream";
+
+type SaveData = string;
+type LoadSaveResult = SaveData | null;
 
 class Bridge {
   maxLines: number;
   erarsContext: ErarsContext;
 
-  constructor(erarsContext: ErarsContext) {
+  stdinStream: Stream<string | number>;
+  stdoutStream: Stream<EmueraResponse>;
+
+  constructor(eraFile: Uint8Array, configText: string) {
     this.maxLines = 2000;
-    this.erarsContext = erarsContext;
+    this.erarsContext = new ErarsContext(eraFile, configText, this);
+
+    this.stdinStream = new Stream();
+    this.stdoutStream = new Stream();
+
+    this.erarsContext.run();
   }
 
-  useUpdate = () => {
-    const [updateFlag, setUpdateFlag] = useState(true);
-    return { updateFlag, clearFlag: () => setUpdateFlag(false) };
-  };
+  async input(console: EmueraResponse): Promise<string | number> {
+    this.stdoutStream.write(console);
+    const resp = await this.stdinStream.read();
 
-  useEra = create<EmueraState>((set, get) => ({
-    current_req: {
-      generation: 0,
-      is_one: false,
-      ty: "AnyKey",
-    },
-    bg_color: [0, 0, 0],
-    hl_color: [255, 255, 0],
-    lines: [],
-    exited: false,
+    window.console.log(resp);
 
-    from: 0,
+    return resp;
+  }
+  async redraw(console: any) {
+    this.stdoutStream.write(console);
+  }
 
-    getState: async () => {
-      const { lines, from } = get();
+  async load_local(idx: number) {
+    return await localforage.getItem<LoadSaveResult>(`save:local:${idx}`);
+  }
+  async load_global() {
+    return await localforage.getItem<LoadSaveResult>(`save:global`);
+  }
 
-      try {
-        const resp = this.erarsContext.run(from) as EmueraResponse;
-        console.log(resp);
+  async save_local(idx: number, sav: SaveData) {
+    await localforage.setItem(`save:local:${idx}`, sav);
+  }
+  async save_global(sav: SaveData) {
+    await localforage.setItem(`save:global`, sav);
+  }
 
-        // Trim empty lines.
-        const responseLines = resp.lines.filter((line) => {
-          return line.parts !== undefined;
-        });
-
-        // Concatenate with existing lines.
-        const accLines = lines.concat(
-          responseLines
-            // Activate new lines
-            .map((line) => ({ ...line, active: true }))
-        );
-
-        set({
-          ...resp,
-          lines: accLines,
-          from: from + responseLines.length,
-        });
-
-        // Slice lines if the length exceeds max line cap.
-        if (accLines.length > this.maxLines)
-          set({ lines: accLines.slice(accLines.length - this.maxLines) });
-
-        return resp;
-      } catch (err) {
-        alert(err);
-        return {} as EmueraResponse;
-      }
-    },
-
-    sendInput: async (input: string) => {
-      const { lines, getState } = get();
-      set({
-        lines: lines
-          .concat([
-            {
-              parts: [
-                {
-                  Text: [
-                    input,
-                    {
-                      color: [255, 255, 255],
-                      font_family: "",
-                      font_style: { bits: FontStyleBit.NORMAL },
-                    },
-                  ],
-                },
-              ],
-            },
-          ])
-          // Deactive existing lines
-          .map((line) => ({ ...line, active: false })),
-      });
-
-      this.erarsContext?.set_input(input);
-      getState();
-    },
-  }));
+  async remove_local(idx: number) {
+    return await localforage.removeItem(`save:local:${idx}`);
+  }
 }
 
 init_logger();
@@ -112,9 +70,7 @@ const gameFile = await gameZip.file("game.era")!.async("uint8array");
 
 const config = await fetch("emuera.config").then((r) => r.text());
 
-const erarsContext = new ErarsContext(new Uint8Array(gameFile), config);
 console.log("Load game done.");
-const singletonInstance = new Bridge(erarsContext);
+const singletonInstance = new Bridge(gameFile, config);
 
-export const { useEra, useUpdate } = singletonInstance;
 export default singletonInstance;
