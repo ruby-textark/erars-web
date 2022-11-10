@@ -53,6 +53,7 @@ function EmueraInput() {
           onKeyDown={({ key }: KeyboardEvent) => {
             if (key === "Enter") {
               era.sendInput(inputValue);
+              setInputValue("");
             }
           }}
         />

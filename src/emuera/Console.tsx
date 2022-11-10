@@ -92,11 +92,16 @@ function Console() {
         bg_color={era.bg_color}
         emulatorSettings={emulatorSettings}
         onClick={clickCallback}
-        onContextMenu={() => setSkipFlag(true)}
+        onContextMenu={(e: MouseEvent) => {
+          e.preventDefault();
+          setSkipFlag(true);
+        }}
       >
-        {era.lines.map((line, idx) => (
-          <ConsoleLineElement key={idx} line={line} />
-        ))}
+        {era.lines
+          .concat(era.last_line ? { ...era.last_line, active: true } : [])
+          .map((line, idx) => (
+            <ConsoleLineElement key={idx} line={line} />
+          ))}
         <EmueraInput />
       </EmueraBackground>
       <EmulatorSettingsDialog />

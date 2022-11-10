@@ -1,4 +1,4 @@
-import { EmueraResponse } from "./types";
+import { EmueraInputResponse, EmueraResponse } from "./types";
 import JSZip from "jszip";
 import localforage from "localforage";
 
@@ -18,7 +18,7 @@ class Bridge {
   maxLines: number;
   erarsContext: ErarsContext;
 
-  stdinStream: Stream<string | number>;
+  stdinStream: Stream<string | bigint>;
   stdoutStream: Stream<EmueraResponse>;
 
   constructor(eraFile: Uint8Array, configText: string) {
@@ -31,15 +31,11 @@ class Bridge {
     this.erarsContext.run();
   }
 
-  async input(console: EmueraResponse): Promise<string | number> {
-    this.stdoutStream.write(console);
-    const resp = await this.stdinStream.read();
-
-    window.console.log(resp);
-
-    return resp;
+  input(req: EmueraInputResponse): Promise<string | bigint> {
+    this.stdoutStream.write(req);
+    return this.stdinStream.read();
   }
-  async redraw(console: any) {
+  async redraw(console: EmueraResponse) {
     this.stdoutStream.write(console);
   }
 

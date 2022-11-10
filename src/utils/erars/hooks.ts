@@ -1,8 +1,8 @@
 import create from "zustand";
-import { EmueraResponse, EmueraState, FontStyleBit } from "./types";
+import { EmueraInputResponse, EmueraStore, FontStyleBit } from "./types";
 import bridge from "./bridge";
 
-const useEra = create<EmueraState>((set, get) => ({
+const useEra = create<EmueraStore>((set, get) => ({
   current_req: {
     generation: 0,
     is_one: false,
@@ -16,61 +16,76 @@ const useEra = create<EmueraState>((set, get) => ({
   maxLines: 2000,
 
   update: async () => {
-    try {
-      const resp = await bridge.stdoutStream.read();
-      console.log(resp);
+    while (true) {
+      try {
+        // Request after current line number.
+        const resp = await bridge.stdoutStream.read();
+        const { lines, maxLines } = get();
 
-      const { maxLines, update } = get();
+        console.log(resp);
 
-      // Trim empty lines.
-      const responseLines = resp.lines
-        .filter((line) => {
-          return line.parts !== undefined;
-        })
-        .map((line) => ({ ...line, active: true }));
+        if (Object.hasOwn(resp, "ty")) {
+          set({
+            current_req: resp as EmueraInputResponse,
+          });
+          continue;
+        }
 
-      set({
-        ...resp,
-        lines: responseLines,
-      });
+        resp.last_line = resp.last_line ?? undefined;
 
-      // Slice lines if the length exceeds max line cap.
-      if (responseLines.length > maxLines)
-        set({ lines: responseLines.slice(responseLines.length - maxLines) });
+        if (resp.rebuild === true) {
+          set(resp);
+        } else {
+          // Trim empty lines.
+          const responseLines =
+            resp.lines?.filter(({ parts }) => parts !== undefined) ?? [];
 
-      update();
-    } catch (err) {
-      alert(err);
+          // Concatenate with existing lines.
+          let accLines = lines.concat(
+            responseLines
+              // Activate new lines
+              .map((line) => ({ ...line, active: true }))
+          );
+
+          // Slice lines if the length exceeds max line cap.
+          if (accLines.length > maxLines)
+            accLines = accLines.slice(accLines.length - maxLines);
+
+          set({
+            ...resp,
+            lines: accLines,
+          });
+        }
+      } catch (err) {
+        alert(err);
+      }
     }
   },
 
-  sendInput: (input: string | number) => {
+  sendInput: (input: string | number = "") => {
     const { lines, current_req } = get();
     set({
-      lines: lines
-        .concat([
-          {
-            parts: [
-              {
-                Text: [
-                  input.toString(),
-                  {
-                    color: [255, 255, 255],
-                    font_family: "",
-                    font_style: { bits: FontStyleBit.NORMAL },
-                  },
-                ],
-              },
-            ],
-          },
-        ])
-        // Deactive existing lines
-        .map((line) => ({ ...line, active: false })),
+      lines: lines.concat([
+        {
+          parts: [
+            {
+              Text: [
+                input.toString(),
+                {
+                  color: [255, 255, 255],
+                  font_family: "",
+                  font_style: { bits: FontStyleBit.NORMAL },
+                },
+              ],
+            },
+          ],
+        },
+      ]),
     });
 
     if (current_req?.ty === "Int") {
-      bridge.stdinStream.write(input);
-    } else bridge.stdinStream.write(input);
+      bridge.stdinStream.write(BigInt(input) as bigint);
+    } else bridge.stdinStream.write(input as string);
   },
 }));
 
